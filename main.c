@@ -63,18 +63,18 @@ static int songCount(const Playlist *p)
     return count;
 }
 
-/* Find the current song's 1-based position. */
-static int currentPosition(const Playlist *p)
+/* Find a song's 1-based position in the playlist. */
+static int songPosition(const Playlist *p, const Song *song)
 {
     const Song *temp;
     int position = 1;
 
-    if (p->current == NULL)
+    if (song == NULL)
         return 0;
 
     for (temp = p->head; temp != NULL; temp = temp->next, position++)
     {
-        if (temp == p->current)
+        if (temp == song)
             return position;
     }
 
@@ -100,11 +100,12 @@ static void pauseScreen(void)
         ;
 }
 
-/* Attractive dashboard backed by the real playlist data. */
+/* Dashboard shows selection separately from the visual playback state. */
 static void showDashboard(const Playlist *p)
 {
     int total = songCount(p);
-    int position = currentPosition(p);
+    int selectedPosition = songPosition(p, p->current);
+    int playingPosition = songPosition(p, p->playing);
 
     clearScreen();
     printf("\n");
@@ -118,21 +119,34 @@ static void showDashboard(const Playlist *p)
     if (p->current != NULL)
     {
         printf("  " WHITE BOLD "%-48.48s" RESET DIM "Track %d of %d" RESET "\n",
-               p->current->title, position, total);
+               p->current->title, selectedPosition, total);
         printf("  " CYAN "%-48.48s" RESET "\n", p->current->artist);
-        printf("  " GREEN "♪  Ready for simulated playback" RESET "\n\n");
+        printf("  " GREEN "Ready for simulated playback" RESET "\n\n");
     }
     else
     {
         printf("  " YELLOW "No song selected — add or load songs to begin." RESET "\n\n");
     }
 
+    printf(BLUE BOLD "  NOW PLAYING\n" RESET);
+    if (p->playing != NULL && playingPosition != 0)
+    {
+        printf("  " WHITE BOLD "%-48.48s" RESET DIM "Track %d of %d" RESET "\n",
+               p->playing->title, playingPosition, total);
+        printf("  " CYAN "%-48.48s" RESET "\n", p->playing->artist);
+        printf("  " GREEN "Visual playback started" RESET "\n\n");
+    }
+    else
+    {
+        printf("  " YELLOW "Nothing playing — press 4 to play selected song." RESET "\n\n");
+    }
+
     printf(BLUE BOLD "  LIBRARY OVERVIEW\n" RESET);
     printf("  " WHITE "♪  Total tracks" RESET "          : %d\n", total);
     printf("  " WHITE "♫  Current position" RESET "      : %s",
-           position ? "" : "Not selected\n");
-    if (position)
-        printf("%d / %d\n", position, total);
+           selectedPosition ? "" : "Not selected\n");
+    if (selectedPosition)
+        printf("%d / %d\n", selectedPosition, total);
     printf("  " WHITE "▣  Playlist structure" RESET "    : Doubly Linked List\n\n");
 
     drawLine();
@@ -163,11 +177,12 @@ static void clearPlaylist(Playlist *p)
     p->head = NULL;
     p->tail = NULL;
     p->current = NULL;
+    p->playing = NULL;
 }
 
 int main(void)
 {
-    Playlist playlist = {NULL, NULL, NULL};
+    Playlist playlist = {NULL, NULL, NULL, NULL};
     int choice = -1;
     int inputStatus;
 
@@ -200,16 +215,16 @@ int main(void)
 
         switch (choice)
         {
-            case 1:  addSong(&playlist);        break;
-            case 2:  removeSong(&playlist);     break;
+            case 1:  addSong(&playlist);         break;
+            case 2:  removeSong(&playlist);      break;
             case 3:  displayPlaylist(&playlist); break;
-            case 4:  playSong(&playlist);       break;
-            case 5:  nextSong(&playlist);       break;
-            case 6:  previousSong(&playlist);   break;
-            case 7:  searchSong(&playlist);     break;
+            case 4:  playSong(&playlist);        break;
+            case 5:  nextSong(&playlist);        break;
+            case 6:  previousSong(&playlist);    break;
+            case 7:  searchSong(&playlist);      break;
             case 8:  shufflePlaylist(&playlist); break;
-            case 9:  savePlaylist(&playlist);   break;
-            case 10: loadPlaylist(&playlist);   break;
+            case 9:  savePlaylist(&playlist);    break;
+            case 10: loadPlaylist(&playlist);    break;
         }
 
         pauseScreen();
