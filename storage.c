@@ -55,6 +55,7 @@ static void freeSongs(Playlist *p)
     p->head = NULL;
     p->tail = NULL;
     p->current = NULL;
+    p->playing = NULL;
 }
 
 /* Save each song as two lines: title followed by artist. */
@@ -104,7 +105,7 @@ void savePlaylist(Playlist *p)
 void loadPlaylist(Playlist *p)
 {
     FILE *file;
-    Playlist loaded = {NULL, NULL, NULL};
+    Playlist loaded = {NULL, NULL, NULL, NULL};
     Song *newSong;
     int titleStatus;
     int artistStatus;
@@ -205,6 +206,7 @@ void loadPlaylist(Playlist *p)
     p->head = loaded.head;
     p->tail = loaded.tail;
     p->current = loaded.current;
+    p->playing = NULL;
 
     printf("\nPlaylist loaded successfully! Songs loaded: %d\n", count);
 }
