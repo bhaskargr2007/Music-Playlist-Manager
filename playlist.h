@@ -17,7 +17,8 @@ typedef struct Playlist
 {
     Song *head;
     Song *tail;
-    Song *current;
+    Song *current;  /* Song currently selected in the playlist */
+    Song *playing;  /* Song most recently started for visual playback */
 
 } Playlist;
 
