@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "playlist.h"
 
-/* Function 1: Play Current Song */
+/* Start visual playback for the currently selected song. */
 void playSong(Playlist *p)
 {
     if (p == NULL || p->head == NULL)
@@ -10,18 +10,21 @@ void playSong(Playlist *p)
         return;
     }
 
-    /* Initialize current pointer */
+    /* Select the first song if no song is currently selected. */
     if (p->current == NULL)
         p->current = p->head;
 
+    /* Only this function changes the visual now-playing pointer. */
+    p->playing = p->current;
+
     printf("\n---------- NOW PLAYING ----------\n");
-    printf("Song Title : %s\n", p->current->title);
-    printf("Artist     : %s\n", p->current->artist);
+    printf("Song Title : %s\n", p->playing->title);
+    printf("Artist     : %s\n", p->playing->artist);
     printf("---------------------------------\n");
-    printf("Simulated playback started!\n");
+    printf("Visual playback started!\n");
 }
 
-/* Function 2: Play Next Song */
+/* Move the selection forward without changing the playing song. */
 void nextSong(Playlist *p)
 {
     if (p == NULL || p->head == NULL)
@@ -30,27 +33,25 @@ void nextSong(Playlist *p)
         return;
     }
 
-    /* If current pointer is NULL */
     if (p->current == NULL)
     {
         p->current = p->head;
-        playSong(p);
+        printf("\nSelected: %s\n", p->current->title);
         return;
     }
 
-    /* Check last song condition */
     if (p->current->next == NULL)
     {
         printf("\nYou are already at the last song!\n");
         return;
     }
 
-    /* Move to next node */
     p->current = p->current->next;
-    playSong(p);
+    printf("\nSelected next song: %s\n", p->current->title);
+    printf("Press 4 to start visual playback of this song.\n");
 }
 
-/* Function 3: Play Previous Song */
+/* Move the selection backward without changing the playing song. */
 void previousSong(Playlist *p)
 {
     if (p == NULL || p->head == NULL)
@@ -59,22 +60,20 @@ void previousSong(Playlist *p)
         return;
     }
 
-    /* If current pointer is NULL */
     if (p->current == NULL)
     {
         p->current = p->head;
-        playSong(p);
+        printf("\nSelected: %s\n", p->current->title);
         return;
     }
 
-    /* Check first song condition */
     if (p->current->prev == NULL)
     {
         printf("\nYou are already at the first song!\n");
         return;
     }
 
-    /* Move to previous node */
     p->current = p->current->prev;
-    playSong(p);
+    printf("\nSelected previous song: %s\n", p->current->title);
+    printf("Press 4 to start visual playback of this song.\n");
 }
