@@ -100,7 +100,7 @@ void removeSong(Playlist *p)
         return;
     }
 
-    /* Update current pointer before freeing */
+    /* Update pointers before freeing the node. */
     if (p->current == temp)
     {
         if (temp->next != NULL)
@@ -108,6 +108,10 @@ void removeSong(Playlist *p)
         else
             p->current = temp->prev;
     }
+
+    /* Never leave playing pointing to a node that is about to be freed. */
+    if (p->playing == temp)
+        p->playing = NULL;
 
     /* Update previous node */
     if (temp->prev != NULL)
@@ -148,7 +152,10 @@ void displayPlaylist(Playlist *p)
         printf("   Artist     : %s\n", temp->artist);
 
         if (temp == p->current)
-            printf("   [Currently Selected]\n");
+            printf("   [Now Selected]\n");
+
+        if (temp == p->playing)
+            printf("   [Now Playing - Visual]\n");
 
         temp = temp->next;
         count++;
