@@ -68,7 +68,8 @@ void shufflePlaylist(Playlist *p)
         songs[i]->next = (i == count - 1) ? NULL : songs[i + 1];
     }
 
-    /* Update playlist pointers */
+    /* Update list boundaries and reset selection to the new head.
+       The playing pointer remains valid because nodes are not freed. */
     p->head = songs[0];
     p->tail = songs[count - 1];
     p->current = p->head;
