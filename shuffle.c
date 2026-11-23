@@ -71,9 +71,10 @@ void shufflePlaylist(Playlist *p)
     /* Update playlist pointers */
     p->head = songs[0];
     p->tail = songs[count - 1];
-    p->current = p->head;
+    /* Keep current and playing node identities; only their order changes. */
 
     free(songs);
+    p->dirty = 1;
 
     printf("\nPlaylist shuffled successfully!\n");
 }
